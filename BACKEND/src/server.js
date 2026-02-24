@@ -22,6 +22,26 @@ app.use(cors({ origin: '*', credentials: true }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+/* ── root route (welcome page) ── */
+app.get('/', (_req, res) => {
+  res.json({
+    success: true,
+    service: 'ResQRoute Backend API',
+    version: '1.0.0',
+    status: 'running',
+    endpoints: {
+      health: '/health',
+      api: '/api/v1',
+      auth: '/api/v1/auth',
+      medical: '/api/v1/medical',
+      fire: '/api/v1/fire',
+      traffic: '/api/v1/traffic'
+    },
+    documentation: 'https://github.com/Shivanand1909/ResQRoute',
+    timestamp: new Date().toISOString()
+  });
+});
+
 /* ── health (always works, even without DB) ── */
 app.get('/health', (_req, res) => res.json({
   status : 'OK',
@@ -41,7 +61,11 @@ try {
 }
 
 /* ── 404 ── */
-app.use((_req, res) => res.status(404).json({ success: false, message: 'Route not found' }));
+app.use((_req, res) => res.status(404).json({ 
+  success: false, 
+  message: 'Route not found',
+  availableRoutes: ['/', '/health', '/api/v1/auth', '/api/v1/medical', '/api/v1/fire']
+}));
 
 /* ── error handler ── */
 app.use((err, _req, res, _next) => {
@@ -69,7 +93,9 @@ app.use((err, _req, res, _next) => {
     console.log('╚══════════════════════════════════════════╝');
     console.log(`  🌐  URL    : http://localhost:${PORT}`);
     console.log(`  ❤️   Health : http://localhost:${PORT}/health`);
-    console.log(`  📡  Mode   : ${process.env.NODE_ENV || 'development'}\n`);
+    console.log(`  📡  API    : http://localhost:${PORT}/api/v1`);
+    console.log(`  📚  Root   : http://localhost:${PORT}/`);
+    console.log(`  🔧  Mode   : ${process.env.NODE_ENV || 'development'}\n`);
   });
 })();
 
